@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Listening Tools Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    color: #1a1a2e;
+    background: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 12px 16px 40px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .header h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    color: #0f0f23;
+    margin-bottom: 6px;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: #666;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #d0d0d8;
+    background: #fff;
+    color: #444;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .filter-btn:hover { border-color: #999; }
+
+  .filter-btn.active {
+    border: 2px solid #0f0f23;
+    background: #0f0f23;
+    color: #fff;
+  }
+
+  .sort-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .sort-select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #d0d0d8;
+    font-family: inherit;
+    font-size: 13px;
+    color: #444;
+    background: #fafafa;
+    cursor: pointer;
+  }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    font-size: 13.5px;
+  }
+
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #888;
+    font-weight: 600;
+    padding: 0 12px 4px;
+  }
+
+  .tool-row {
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .tool-row td {
+    padding: 12px;
+    background: #fff;
+    vertical-align: middle;
+  }
+
+  .tool-row td:first-child { border-radius: 10px 0 0 10px; }
+  .tool-row td:last-child { border-radius: 0 10px 10px 0; text-align: center; font-size: 16px; color: #999; }
+
+  .tool-row:hover td { background: #f8f8fc; }
+  .tool-row.open td { background: #f4f4fb; }
+
+  .tool-row td {
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .tool-row.open td {
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+  }
+
+  .tool-name {
+    font-weight: 700;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cat-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .best-for { color: #555; }
+  .price { font-weight: 600; white-space: nowrap; }
+  .seats { color: #555; white-space: nowrap; }
+
+  /* Expanded detail */
+  .detail-row td { padding: 0 12px 8px; }
+
+  .detail-grid {
+    background: #f9f9ff;
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 28px;
+    font-size: 13px;
+    line-height: 1.55;
+    border: 1px solid #e8e8f0;
+  }
+
+  .detail-label {
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+
+  .detail-label.standout { color: var(--cat-color); }
+  .detail-label.limitation { color: #c44; }
+
+  .cat-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .detail-text { color: #333; }
+  .detail-text.dim { color: #555; }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #777;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .empty-msg {
+    text-align: center;
+    color: #999;
+    padding: 24px;
+  }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .header h2 { font-size: 20px; }
+    .detail-grid { grid-template-columns: 1fr; }
+    table { font-size: 12.5px; }
+    .hide-mobile { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="header">
+    <h2>Social Listening Tools — At a Glance</h2>
+    <p>Filter by use-case, sort by price, and tap a row for details.</p>
+  </div>
+
+  <div class="controls" id="filters"></div>
+  <div class="sort-row">
+    <select class="sort-select" id="sortSelect">
+      <option value="price-asc">Price: Low → High</option>
+      <option value="price-desc">Price: High → Low</option>
+      <option value="name">Alphabetical</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Best For</th>
+          <th>Starting Price</th>
+          <th class="hide-mobile">Seats</th>
+          <th style="width:48px"></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <p class="empty-msg" id="emptyMsg" style="display:none;">No tools match this filter.</p>
+
+  <div class="legend" id="legend"></div>
+</div>
+
+<script>
+const tools = [
+  { name:"Keyword Scouter", bestFor:"Solo founders & small B2B teams", platforms:"LinkedIn, Reddit, X", startingPrice:49, priceLabel:"$49/mo", seats:"1 user (starter)", standout:"Real-time intent-based lead discovery with location filtering", limitations:"No publishing or full social management", category:"lead-gen" },
+  { name:"Brand24", bestFor:"Marketing teams & agencies", platforms:"Instagram, Facebook, X, TikTok, YouTube, Reddit, news, blogs, podcasts", startingPrice:249, priceLabel:"$249/mo", seats:"1 – unlimited", standout:"AI summaries across 9+ source types incl. podcasts", limitations:"12–24 month historical data cap; no publishing", category:"monitoring" },
+  { name:"Sprout Social", bestFor:"B2B teams & agencies managing multiple channels", platforms:"LinkedIn, Instagram, Facebook, X, Pinterest, YouTube, TikTok", startingPrice:199, priceLabel:"$199/user/mo", seats:"5 – unlimited", standout:"All-in-one publishing + monitoring + analytics", limitations:"Per-user pricing adds up; limited Reddit coverage", category:"all-in-one" },
+  { name:"Brandwatch", bestFor:"Enterprise brand intelligence", platforms:"95M+ sources globally", startingPrice:800, priceLabel:"~$800/mo", seats:"Custom", standout:"Deep Boolean queries, audience segmentation, long-term historical data", limitations:"Steep learning curve; requires dedicated resources", category:"enterprise" },
+  { name:"Hootsuite", bestFor:"Established social media teams", platforms:"Instagram, Facebook, X, LinkedIn, Pinterest, YouTube, TikTok", startingPrice:99, priceLabel:"$99/user/mo", seats:"1 – 5 users", standout:"Familiar publishing hub with add-on monitoring", limitations:"Listening is shallow vs. dedicated tools; per-seat cost", category:"all-in-one" },
+  { name:"BuzzSumo", bestFor:"Content strategists & trend researchers", platforms:"Social, web, news", startingPrice:199, priceLabel:"$199/mo", seats:"1 – 30 users", standout:"Content performance analysis & influencer identification", limitations:"Not built for real-time engagement or lead gen", category:"content" },
+  { name:"Statusbrew", bestFor:"Agencies managing multiple brands", platforms:"Instagram, X, YouTube, Reddit, Threads, web", startingPrice:89, priceLabel:"$89/mo", seats:"1 – 6 users", standout:"Unified inbox with live query previews & sentiment tagging", limitations:"Fewer source types; pricier than pure monitoring tools", category:"all-in-one" },
+  { name:"Mentionlytics", bestFor:"PR & marketing teams tracking mentions", platforms:"Social, news, web, blogs", startingPrice:59, priceLabel:"$59/mo", seats:"2 – unlimited", standout:"Fast setup, real-time alerts, clean UI", limitations:"Shallow analytics; weak Reddit & TikTok coverage", category:"monitoring" }
+];
+
+const categories = [
+  { id:"all", label:"All Tools" },
+  { id:"lead-gen", label:"Lead Gen" },
+  { id:"monitoring", label:"Monitoring" },
+  { id:"all-in-one", label:"All-in-One" },
+  { id:"content", label:"Content Intel" },
+  { id:"enterprise", label:"Enterprise" }
+];
+
+const catColors = { "lead-gen":"#2d9d78", "monitoring":"#5b8def", "all-in-one":"#e07c3a", "content":"#b065d9", "enterprise":"#d9534f" };
+
+let activeCategory = "all";
+let sortBy = "price-asc";
+let expandedRow = null;
+
+function catLabel(id) { return (categories.find(c => c.id === id) || {}).label || id; }
+
+function render() {
+  let list = activeCategory === "all" ? [...tools] : tools.filter(t => t.category === activeCategory);
+  if (sortBy === "price-asc") list.sort((a,b) => a.startingPrice - b.startingPrice);
+  else if (sortBy === "price-desc") list.sort((a,b) => b.startingPrice - a.startingPrice);
+  else list.sort((a,b) => a.name.localeCompare(b.name));
+
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+
+  document.getElementById("emptyMsg").style.display = list.length ? "none" : "block";
+
+  list.forEach(tool => {
+    const isOpen = expandedRow === tool.name;
+    const color = catColors[tool.category] || "#888";
+
+    const tr = document.createElement("tr");
+    tr.className = "tool-row" + (isOpen ? " open" : "");
+    tr.innerHTML = `
+      <td><span class="tool-name"><span class="cat-dot" style="background:${color}"></span>${tool.name}</span></td>
+      <td class="best-for">${tool.bestFor}</td>
+      <td class="price">${tool.priceLabel}</td>
+      <td class="seats hide-mobile">${tool.seats}</td>
+      <td>${isOpen ? "▲" : "▼"}</td>
+    `;
+    tr.addEventListener("click", () => { expandedRow = isOpen ? null : tool.name; render(); });
+    tbody.appendChild(tr);
+
+    if (isOpen) {
+      const dr = document.createElement("tr");
+      dr.className = "detail-row";
+      dr.innerHTML = `<td colspan="5">
+        <div class="detail-grid" style="--cat-color:${color}">
+          <div>
+            <div class="detail-label">Platforms</div>
+            <div class="detail-text">${tool.platforms}</div>
+          </div>
+          <div>
+            <div class="detail-label">Category</div>
+            <span class="cat-badge" style="background:${color}">${catLabel(tool.category)}</span>
+          </div>
+          <div>
+            <div class="detail-label standout">✦ Standout</div>
+            <div class="detail-text">${tool.standout}</div>
+          </div>
+          <div>
+            <div class="detail-label limitation">⚠ Limitations</div>
+            <div class="detail-text dim">${tool.limitations}</div>
+          </div>
+        </div>
+      </td>`;
+      tbody.appendChild(dr);
+    }
+  });
+}
+
+// Build filter buttons
+const filtersEl = document.getElementById("filters");
+categories.forEach(c => {
+  const btn = document.createElement("button");
+  btn.className = "filter-btn" + (c.id === activeCategory ? " active" : "");
+  btn.textContent = c.label;
+  btn.addEventListener("click", () => { activeCategory = c.id; buildFilters(); render(); });
+  filtersEl.appendChild(btn);
+});
+
+function buildFilters() {
+  filtersEl.querySelectorAll(".filter-btn").forEach((btn, i) => {
+    btn.className = "filter-btn" + (categories[i].id === activeCategory ? " active" : "");
+  });
+}
+
+// Sort
+document.getElementById("sortSelect").addEventListener("change", e => { sortBy = e.target.value; render(); });
+
+// Legend
+const legendEl = document.getElementById("legend");
+categories.filter(c => c.id !== "all").forEach(c => {
+  const span = document.createElement("span");
+  span.className = "legend-item";
+  span.innerHTML = `<span class="legend-dot" style="background:${catColors[c.id]}"></span>${c.label}`;
+  legendEl.appendChild(span);
+});
+
+render();
+</script>
+</body>
+</html>
